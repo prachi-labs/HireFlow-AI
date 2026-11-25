@@ -1,0 +1,6 @@
+{
+  "name": "HireFlow AI",
+  "description": "AI recruitment automation platform powered by Aira — automated CV-to-JD screening, Level 1 voice interviews, evidence-based rubric evaluation, and Level 2 scheduling.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

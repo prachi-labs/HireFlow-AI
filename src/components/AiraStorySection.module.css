@@ -1,0 +1,309 @@
+/* ============================================================================
+ * AIRA SCROLL STORY SECTION — BURGUNDY & NEAR-BLACK CINEMATIC STAGE
+ * ============================================================================ */
+
+.storyTrack {
+  position: relative;
+  width: 100%;
+  height: var(--story-height-desktop, 500vh);
+  background: #10090d;
+  color: #ffffff;
+  isolation: isolate;
+}
+
+.stickyStage {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100svh;
+  min-height: 620px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 85% 75% at 50% 42%, rgba(75, 21, 40, 0.42) 0%, rgba(43, 13, 26, 0.28) 46%, #10090d 100%),
+    #10090d;
+}
+
+.farGlow {
+  position: absolute;
+  inset: -12%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle 48vmax at 50% 48%, rgba(123, 41, 72, 0.34) 0%, rgba(75, 21, 40, 0.16) 44%, transparent 74%),
+    radial-gradient(circle 34vmax at 22% 28%, rgba(43, 13, 26, 0.48) 0%, transparent 70%);
+  will-change: transform;
+  z-index: 1;
+}
+
+.particleCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Soft floor radial gradient grounding Aira into the scene */
+.floorFade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22svh;
+  pointer-events: none;
+  background: linear-gradient(to top, #10090d 0%, rgba(16, 9, 13, 0.65) 48%, transparent 100%);
+  z-index: 6;
+}
+
+/* Centered Aira stage */
+.characterViewport {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  perspective: 1200px;
+  z-index: 4;
+}
+
+.rimGlow {
+  position: absolute;
+  bottom: 8svh;
+  left: 50%;
+  width: clamp(320px, 42vw, 600px);
+  height: clamp(380px, 66svh, 660px);
+  transform: translate3d(-50%, 0, 0);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse 62% 66% at 50% 48%,
+    rgba(194, 106, 138, 0.34) 0%,
+    rgba(123, 41, 72, 0.28) 38%,
+    rgba(75, 21, 40, 0.14) 64%,
+    transparent 78%
+  );
+  filter: blur(26px);
+  will-change: transform;
+  z-index: 3;
+}
+
+.floorShadow {
+  position: absolute;
+  bottom: clamp(18px, 3svh, 34px);
+  left: 50%;
+  width: clamp(240px, 28vw, 390px);
+  height: clamp(28px, 4svh, 46px);
+  transform: translate3d(-50%, 0, 0);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(6, 3, 5, 0.92) 0%, rgba(43, 13, 26, 0.45) 54%, transparent 76%);
+  filter: blur(10px);
+  will-change: transform;
+  z-index: 3;
+}
+
+.airaRig {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transform-origin: 50% 88%;
+  transform-style: preserve-3d;
+  will-change: transform;
+  z-index: 5;
+}
+
+.airaCutout {
+  display: block;
+  height: clamp(410px, 74svh, 730px);
+  width: auto;
+  max-width: 88vw;
+  object-fit: contain;
+  object-position: bottom center;
+  user-select: none;
+  pointer-events: none;
+}
+
+.airaVideo,
+.airaFrameCanvas {
+  display: block;
+  height: clamp(410px, 74svh, 730px);
+  width: auto;
+  max-width: 88vw;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Intro & Closing Floating Typography */
+.centerBeatCopy {
+  position: absolute;
+  left: 50%;
+  top: clamp(24px, 5.2svh, 52px);
+  width: min(90vw, 680px);
+  text-align: center;
+  z-index: 12;
+  will-change: transform, opacity, filter;
+}
+
+.closingBeatCopy {
+  position: absolute;
+  left: clamp(20px, 4.4vw, 68px);
+  top: 50%;
+  width: clamp(280px, 27vw, 375px);
+  z-index: 14;
+  will-change: transform, opacity, filter;
+}
+
+.displayHeadline {
+  font-family: 'Archivo', sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-variation-settings: 'wdth' 94, 'wght' 900;
+  letter-spacing: -0.02em;
+  line-height: 0.98;
+  color: #ffffff;
+  text-wrap: balance;
+  text-shadow:
+    0 2px 18px rgba(16, 9, 13, 0.85),
+    0 0 38px rgba(123, 41, 72, 0.55);
+}
+
+/* Glass Feature Cards (Left & Right Alternation on Desktop) */
+.glassCard {
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 18px;
+  box-shadow: 0 24px 64px rgba(10, 4, 8, 0.55);
+}
+
+.desktopCardLeft {
+  position: absolute;
+  left: clamp(20px, 4.4vw, 68px);
+  top: 50%;
+  width: clamp(275px, 26.5vw, 375px);
+  z-index: 13;
+  will-change: transform, opacity, filter;
+}
+
+.desktopCardRight {
+  position: absolute;
+  right: clamp(118px, 9.5vw, 156px);
+  top: 50%;
+  width: clamp(275px, 26.5vw, 375px);
+  z-index: 13;
+  will-change: transform, opacity, filter;
+}
+
+/* Animated voice waveform bars (compositor scaleY only) */
+.waveBar {
+  transform-origin: center bottom;
+  animation: airaWavePulse 1.35s ease-in-out infinite alternate;
+}
+
+@keyframes airaWavePulse {
+  0% {
+    transform: scaleY(0.32);
+    opacity: 0.65;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+/* Right-edge 4-beat vertical progress rail */
+.edgeRail {
+  position: absolute;
+  right: clamp(10px, 1.8vw, 24px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.edgeTrack {
+  position: relative;
+  width: 2px;
+  height: 140px;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.edgeFill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, #c26a8a 0%, #39c98a 100%);
+  transform-origin: top center;
+  will-change: transform;
+}
+
+/* Mobile & Tablet Docked Layout (<= 820px) */
+@media (max-width: 820px) {
+  .storyTrack {
+    height: var(--story-height-mobile, 350vh);
+  }
+
+  .characterViewport {
+    align-items: center;
+    padding-top: 72px;
+    padding-bottom: 22svh;
+  }
+
+  .airaCutout,
+  .airaVideo,
+  .airaFrameCanvas {
+    height: clamp(260px, 43svh, 420px);
+    max-width: 84vw;
+  }
+
+  .rimGlow {
+    bottom: 28svh;
+    width: 260px;
+    height: 300px;
+  }
+
+  .floorShadow {
+    bottom: 26svh;
+    width: 200px;
+  }
+
+  .centerBeatCopy {
+    top: 22px;
+    width: calc(100% - 48px);
+  }
+
+  .desktopCardLeft,
+  .desktopCardRight,
+  .closingBeatCopy {
+    left: 16px;
+    right: 16px;
+    top: auto;
+    bottom: 16px;
+    width: auto;
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .edgeRail {
+    right: 10px;
+    top: 24%;
+  }
+
+  .edgeTrack {
+    height: 88px;
+  }
+}
+
+/* Reduced Motion Static Layout */
+@media (prefers-reduced-motion: reduce) {
+  .waveBar {
+    animation: none !important;
+    transform: scaleY(0.75) !important;
+  }
+}

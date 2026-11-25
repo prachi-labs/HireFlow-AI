@@ -1,0 +1,218 @@
+HireFlow AI – Master Build Prompt
+Project: HireFlow AI  |  AI recruiter: Aira  |  Category: AI recruitment automation platform
+How to use: Paste everything from Section 0 onward into your AI coding agent (Claude Code, Cursor, etc.) with your project folder open. Attach three images: (1) the Aira character image, (2) the login/signup reference image, (3) your existing recruiter image. The agent must complete Step 1 (audit) and report before writing any code.
+0. Your role
+You are a senior full-stack engineer, voice-AI engineer, UI/UX designer and software architect. You are building HireFlow AI incrementally on top of the existing project. Prioritise working functionality, clean architecture, security and consistent design over large amounts of code. If a paid service, API key or asset is required, state exactly what is needed, then wait for it. Never fake it.
+1. What the product does (the core automated flow)
+Aira is a fully automated AI recruiter. The end-to-end flow is:
+1.  Job Descriptions (JDs) already exist in the system. The recruiter picks one.
+2.  The recruiter uploads one or many CVs (PDF/DOCX).
+3.  The system parses each CV and matches it against the JD (skills, qualification, experience), producing an explainable match percentage and a ranked list.
+4.  Candidates at or above a recruiter-configured threshold (default 70%) become Shortlisted. Others are marked Needs Review, never auto-rejected.
+5.  Aira phones each shortlisted candidate and conducts a structured Level 1 telephonic interview in a soft, natural, human-sounding voice, with consent, follow-up questions, interruption handling and time limits.
+6.  The call is transcribed and evaluated against a role-specific rubric. A structured report (and PDF) is saved to the candidate profile.
+7.  The recruiter reviews results, and approves, holds or rejects. Approved candidates receive a Level 2 invitation email.
+Automation rule: after the recruiter starts a 'Screening and Interview Campaign' (one explicit authorization), steps 2 to 6 run without further clicks. Humans make every final hiring decision.
+2. Non-negotiable rules
+1.  Audit first. Do not rebuild from scratch. Reuse existing code. Never delete working functionality.
+2.  Never replace app.py (Streamlit). Preserve candidate_db.py, main.py, jd_reader.py, skill_matcher.py, Candidate.xlsx and the openpyxl logic. Locate their real paths first.
+3.  Keep React + TypeScript + Vite. No framework migration without approval. No unnecessary dependencies.
+4.  Existing candidate Excel columns stay: ID, NAME, PHONE NO., EMAIL, QUALIFICATIONS, PASSING YEAR, EXPERIENCE, FEEDBACK, STATUS. Extend the data model, never remove fields.
+5.  No hardcoded keys, passwords or secrets. Use .env plus .env.example.
+6.  No fabricated data. No fake interview results, candidates, scores, call statuses or integration statuses. If a provider is not configured, the UI says 'Not configured' and the feature is disabled with an explanation.
+7.  Every visible button, icon, menu and tab must work.
+8.  Work in milestones. Before each change, say which files you will touch. After each milestone, run it, check terminal and browser console, test, and run regression checks (login, signup, app.py, candidate_db.py, Excel operations, npm run build).
+9.  Never claim an interview, call or email happened unless the provider confirmed it.
+3. Reality check: required services and limits (report costs before integrating)
+Capability
+Purpose
+Options (configurable, behind an adapter interface)
+Telephony
+Outbound calls to candidates
+Twilio Programmable Voice with Media Streams, or Exotel (India)
+Speech-to-text
+Streaming transcription, English (India) + Hindi
+Deepgram, Google STT, Azure Speech
+LLM
+Interview conversation, JD/CV understanding, evaluation
+Anthropic Claude API (default), swappable
+Text-to-speech
+Aira's voice
+ElevenLabs, Azure Neural (for example en-IN female), Google Neural2
+Email
+Level 2 invitations
+SMTP or Gmail API
+Known limits you must tell me about:
+• Live calls need a publicly reachable HTTPS/WSS server. Use a tunnel such as ngrok in development. Free hosting tiers often sleep and cannot run live calls.
+• Twilio trial accounts can usually only call verified numbers. Telephony, STT and TTS are paid per minute.
+• India: outbound calling is regulated (TRAI/DND/DLT rules). Only call candidates who applied, inside allowed hours (default 9:00 to 21:00 candidate local time), and keep consent records. I will confirm compliance with my provider.
+• Build a Web Interview (test mode) that runs the same interview engine in the browser with the microphone. It is used for testing without call costs and as the accessible alternative to a phone call.
+'100% working' means: every feature passes the tests in Section 18. Features that depend on my credentials must be fully built and verified with sandbox or test credentials, and shown honestly as 'Needs credentials' until I add them.
+4. Design system
+Premium, cinematic, dark. Keep existing values where the project already defines them.
+• Backgrounds: #10090D (primary), #1A1017 (secondary). Burgundy #4B1528, deep burgundy #2B0D1A, accent #7B2948.
+• Text: #FFFFFF, secondary #C8B9C0, muted #8E7E87.
+• Glass: border rgba(255,255,255,0.12), surface rgba(255,255,255,0.055).
+• Status: success #39C98A, warning #E8B45C, error #EF6677.
+• Fonts: Archivo (Black Italic) for hero headline, Urbanist for UI text, Inter for data and tables.
+• Glassmorphism cards, thin borders, rounded corners, soft shadows, burgundy ambient light. Avoid gaming-bright colours, clutter and gratuitous animation. Respect prefers-reduced-motion.
+• Responsive at 1200, 1000, 768 and 480px. Desktop is the primary target.
+5. Pages and routes (multi-page; keep existing routes, add missing ones)
+Route
+Page
+Key content
+/
+Landing + Aira hero
+Interactive hero (Section 7), Features, How It Works, About, Contact, final CTA
+/login
+Login
+Section 6
+/signup
+Signup
+Section 6
+/dashboard
+Home
+Time-based greeting, compact Aira panel, live stats, recent activity, pipeline
+/jobs, /jobs/:id
+Job Descriptions
+List, search, add/edit/delete, upload PDF/DOCX/TXT, parser preview, activate/deactivate, associated candidates, 'Start campaign'
+/resumes
+CV Management
+Single and bulk upload, parsing status, duplicate and unreadable-file handling
+/screening
+AI Screening
+Pick JD, upload CVs, ranked results, match breakdown and explanation, shortlist threshold, recruiter override
+/candidates, /candidates/:id
+Candidates
+CRUD, search, filter, export; profile with CV, match, status history, interviews, notes
+/interviews
+Interview Center
+Campaign queue, live call status, retries, missed calls, schedule windows
+/interviews/:id
+Interview Result
+Transcript (if consented), scores with evidence, strengths, follow-ups, PDF download
+/interview/web/:token
+Web Interview
+Browser-based Aira interview with the 3D avatar (test mode and accessible alternative)
+/level2
+Level 2
+Approve/hold/reject, scheduling form, email send, invitation history
+/pipeline
+Pipeline
+Stage board with valid-transition rules and audit trail
+/analytics
+Analytics and Reports
+Charts from real data, Excel and PDF export
+/notifications
+Notifications
+Badge, read/unread, history, deep links
+/settings
+Settings
+Profile, AI/voice, integrations, security
+All dashboard routes require authentication and role-based permissions.
+6. Login and signup (use the reference image)
+Use the attached reference image as the layout and interaction model, re-themed to HireFlow. Do not copy its branding, game icon, green colours or text.
+• Full-screen split layout inside a rounded glass card on the dark background. A top tab bar with HOME and JOIN (JOIN highlighted) and a small language selector (EN/FR/RU style) at the top right. Only include languages that are actually translated, otherwise omit the selector.
+• Left side: small eyebrow 'START FOR FREE', large underlined title, a switch line ('Already a member? Log in' or 'Don't have an account? Create one'), translucent glass input fields with small icons and floating labels, show/hide password toggle, and one prominent CTA button with a warm burgundy-rose gradient and glow.
+• Create New Account fields: First name, Last name, Work email, Company name, Password, Confirm password.
+• Sign In fields: Email, Password, Remember me, Forgot password. Include loading state and clear inline error messages.
+• Right side: the existing recruiter image (preserve it; do not use Aira on auth pages) over a burgundy gradient with soft ambient lighting. If you cannot find it, ask me.
+• Footer icons on the card: include Google and LinkedIn sign-in only if OAuth is actually implemented. Otherwise omit them.
+• Preserve existing authentication logic, validation, and routes. Only change presentation and extend functionality where needed (duplicate-account handling, password confirmation, forgot-password flow with real email, secure password hashing). Inspect the current auth first and integrate with it.
+• Smooth switching between Sign In and Create Account without a full reload, plus mobile layout (image collapses behind or above the form).
+7. Home page: the interactive Aira hero
+Adapt the 'Cadet Skyranger' interactive character hero to Aira. Implement it as a reusable React + TypeScript component AiraHero (CSS module, no new libraries) used full-screen on /, with a compact variant on /dashboard. Logic stays vanilla and framework-light inside hooks.
+Frame and scaling. One 1440x810 (16:9) frame covering the viewport: --u = max(100vw/1440, 100vh/810), centred with left: calc(50% - 720u) and top: calc(50% - 405u). No transforms on the frame. All positions below are in frame units.
+Assets (you cannot invent these; request or generate them and document the process):
+• aira-plate.jpg (1920x1080): Aira from the supplied image, centred and rising from the bottom, tablet under her arm and open palm gesture, on a near-black burgundy studio background with a warm burgundy rim glow and a soft glowing floor horizon. Composite the supplied transparent PNG over a generated or CSS-rendered background once, and export as a static file. Preserve her identity exactly: long wavy brown hair, round glasses, hoop earrings, brown blazer, cream turtleneck.
+• aira-head.mp4 (about 580x600, about 5s, 24fps, muted, keyframe every 4 frames): a crop around her head taken from the same plate. Frame 0 looks toward screen-left, the last frame toward screen-right, even speed between. Produce it with an image-to-video tool from the plate (identity-consistent), then encode with ffmpeg using -g 4 -an. Provide the exact generation prompt and ffmpeg command in your report.
+• If the clip is not yet available, ship a clearly flagged fallback (static plate with subtle pointer parallax) and tell me. Do not pretend it is the final effect.
+• Rule: nothing in the character is drawn in code. Head movement comes only from the clip. UI elements (buttons, cards) may be drawn in code.
+Type and colour. Headline 'AIRA' in Archivo Black Italic (variable, wdth 94%, weight 900), 100u, tracking -.02em, white with a three-layer glow (white 14u, rose #C26A8A 34u, burgundy #7B2948 70u). Everything else Urbanist 600/700. Muted text #C8B9C0, page #10090D.
+Layout (frame units).
+• Logo: round HireFlow mark plus 'HireFlow AI' (Urbanist 600, 29.5u) at (55, 54).
+• Nav at the top right: Home, Features, How It Works, About, Contact, Login, Get Started. At 820px or less, collapse to a three-bar menu that really opens the nav.
+• Copy block centred, top 122: eyebrow 'YOUR AI RECRUITER' (Urbanist 700, 18u, tracking .46em), headline 'AIRA', subtitle 'Recruit Smarter. Hire Faster.' (Urbanist 600, 23u). Two CTAs below the subtitle: Get Started (to /signup) and Meet Aira (toggles Talk Mode).
+• Captions bottom-left 'AI Recruitment Automation' and bottom-right 'HireFlow AI' (Urbanist 700, 12.2u).
+• Head clip placed over her head (about 435x450) with object-fit: fill and a soft radial mask (ellipse 50% 50% at 50% 46%, solid to 72%, clear at 99%) so there is no visible seam. Hidden at first, fades in over 0.6s on its first seek.
+Interaction.
+• Head follows the cursor. Fetch the whole clip as a blob and use an object URL (fallback to the URL on failure) so seeks are instant. Map pointer x across the frame (14% to 86%) to clip time 0 to end. Each animation frame, ease the shown time toward the target (x0.14) and set currentTime when not already seeking. After 3.5s of no movement, drift gaze side to side (sine around the middle, +/-32% of the clip). The clip is never played, only scrubbed.
+• Ring cursor on fine pointers: 7px white dot on the pointer and a 44px ring (1.5px white border) easing after it (x0.55 per frame). Hide the system cursor over the stage.
+• TALK TO AIRA button (replaces PUSH ME): a real <button>, 75u glossy burgundy-rose radial-gradient circle with a mic icon and label, placed lower centre in front of her. Clicking presses it (scale .88 and back, 320ms) and toggles Talk Mode with aria-pressed. Talk Mode: head scrubbing eases back to the centre frame (she looks at the user), state goes Greeting then Listening, the browser asks for microphone permission (handle denial with a text-chat fallback), and a glass 'conversation card' rises near her open hand (live transcript, mute, stop, text input). Clicking again closes it. The button glows while active.
+• Entrance (about 1.8s, one Web Animations timeline): logo and nav drop in, eyebrow tracking tightens from .9em, headline rises from a 14px blur, subtitle and CTAs follow, the Talk button pops in last.
+• Reduced motion: no entrance, no head clip; plate only.
+• Phones (820px or less): frame still covers the screen with Aira filling the lower part; logo and menu pinned to the top corners; copy centred near the top (headline 40 to 64px, eyebrow 14px, subtitle 16px); captions pinned to the bottom corners.
+Dashboard Home variant: the same component in a compact 'Aira panel' with time-based greeting ('Good Morning/Afternoon/Evening, Recruiter!'), state indicator, voice button, text chat, and quick actions (Review new candidates, Upload a JD, Start CV screening, View interview results, Check pending interviews). Aira's spoken and written summaries must be generated from real database numbers.
+8. Aira character system (3D look, state-driven, honest lip-sync)
+Aira must look like the supplied Pixar-style 3D character and never be redesigned. Build one AiraAvatar component with an explicit state machine: Idle, Greeting, Listening, Thinking, Speaking, Smiling, Processing, Error, with smooth transitions.
+Phase 1 (zero GPU cost, build now):
+• Base: the plate and head clip from Section 7.
+• Blinking: eyelid overlay sprites (open, half, closed) aligned to measured eye coordinates, random interval 2 to 6s.
+• Breathing: sub-pixel vertical scale on the torso layer.
+• Eyebrow and smile variants: small pre-rendered overlays or short clips generated from the same character for Listening, Thinking and Smiling.
+• Lip-sync: a set of about 8 mouth-shape (viseme) overlay sprites of her lower face, aligned to the plate. While speaking, the head returns to the centre frame and the viseme layer is shown. Drive visemes from the TTS provider's viseme or alignment timestamps where available (Azure viseme events, ElevenLabs character alignment). Otherwise drive them from a Web Audio AnalyserNode on the actual output audio. The mouth must never move unless audio is actually playing. Stop the mouth within 100ms of audio ending or being interrupted.
+• Produce the overlay sprites with an image editing tool from the supplied character, and ask me to approve them before wiring.
+Phase 2 (optional upgrade, present trade-offs first): a rigged 3D model of Aira (GLB with ARKit-style blendshapes) rendered with Three.js, or a streaming avatar service (for example HeyGen, D-ID or Simli) fed with her image. Explain cost, licensing and latency, recommend one, and wait for my approval.
+On the phone she has no visuals; the avatar is shown on the dashboard, landing page and Web Interview page. Do not infer emotion, honesty or competence from a candidate's face or voice.
+9. Aira's voice and personality
+• Voice goal: soft, warm, calm, natural and realistic, like a friendly professional HR recruiter. Primary language English (India), with Hindi supported. Use streaming neural TTS behind a TTSProvider interface. Settings let me choose among at least three voices and preview them. Recommend defaults and explain why.
+• Delivery: slightly slower than default rate (about 0.95), gentle pitch, short sentences, 250 to 400ms pauses between sentences (SSML or provider equivalents), occasional natural acknowledgements ('I see', 'Got it', 'Thanks for sharing that') used sparingly. No robotic phrasing, no jargon, no reading lists aloud.
+• Persona prompt rules: professional, friendly, respectful, confident, conversational. Never claims to be human. Never promises a job outcome. Never asks about protected attributes (age, religion, marital status, health, caste, and so on). Stays on topic and politely returns to the interview. Keeps to the structured plan.
+• Example greeting (web/dashboard): 'Hello! Welcome to HireFlow AI. I'm Aira, your virtual recruitment assistant. How are you doing today?'
+• Example recruiter summary: 'Good morning! You have N candidates awaiting screening...' (numbers must come from the database).
+10. Automated CV to JD screening engine
+• Parse CVs with pypdf and python-docx (reuse existing extraction where present). Extract name, email, phone, education, qualifications, passing year, skills, experience, projects, certifications. Validate readability, supported format, duplicates (by email/phone/hash) and existing candidates. Show clear errors for bad files. Store files in a private directory, never publicly served.
+• Parse JDs (PDF/DOCX/TXT) with jd_reader.py extended as needed, and show extracted fields for recruiter verification before saving.
+• Extend skill_matcher.py without removing existing behaviour. Handle synonyms (for example 'JS' and 'JavaScript') and optional LLM-assisted semantic matching, always with a deterministic fallback.
+• Configurable, documented weights (default): required skills 40%, experience 25%, qualification 15%, preferred skills 10%, certifications/other 10%. Show Overall, Skills, Qualification and Experience match, Matching Skills, Missing Required Skills, and a plain-language explanation.
+• Unknown or missing information is treated as unknown, not negative (exclude it and renormalise weights). Do not use or infer protected attributes, names or photos in scoring. Save the criteria version used with every result.
+• Threshold shortlisting is automatic. Below threshold = 'Needs Review' with recruiter override. No automatic rejection from a score.
+11. Automated Level 1 phone interview engine
+Architecture (modular adapters): campaign queue, call scheduler, telephony adapter, real-time media websocket, VAD plus streaming STT, interview orchestrator (state machine plus LLM), streaming TTS, recorder/transcriber, evaluator, notifier. Each piece is replaceable.
+Campaign automation. When a campaign starts, create an interview plan per candidate (generated from the JD and CV, stored and editable by the recruiter before or after). Calls are queued and placed automatically inside the allowed calling window with a concurrency limit. Retries: configurable (default 2 retries, at least 4 hours apart). The recruiter can retry manually. Never call outside the window, never exceed the limit, never call without a verified application and campaign authorisation.
+Call flow.
+1.  Place the call. Validate provider webhook signatures. Track statuses: queued, ringing, answered, voicemail, no-answer, busy, failed, completed, declined, consent-denied.
+2.  Identity check: 'Hello! Am I speaking with [Name]?' If it is not the candidate, reveal nothing about the application, apologise and end.
+3.  Disclosure and consent: 'My name is Aira, the virtual AI recruitment assistant from [Company]. I'm calling about your application for [Job Title]. This is an AI-assisted preliminary interview and, with your permission, it will be recorded and transcribed. Do I have your permission to proceed?' Also offer language choice (English/Hindi) and a human-recruiter alternative. If declined, end politely, log the consent outcome and flag the candidate for recruiter follow-up. Without consent, do not record or transcribe.
+4.  Voicemail or answering machine: hang up, log it, do not leave candidate details.
+Interview stages (Aira follows the plan, not a fixed script): 1 Introduction and readiness; 2 Education and certifications; 3 Professional experience and projects; 4 Job-specific technical questions generated from the JD at the candidate's level (for example for a Python role: lists vs tuples, inheritance, exception handling, SQL joins); 5 Scenario-based problem solving; 6 Job-relevant communication (never judge accent, voice or speaking style); 7 Availability (notice period, joining date, expected salary and location preference only when relevant); 8 Candidate's questions (answer only from approved company information, otherwise say the team will follow up); 9 Warm closing: 'Thank you for your time. It was a pleasure speaking with you. Our recruitment team will review your interview and update you about the next steps.'
+Dynamic conversation. The orchestrator tracks stage, questions asked and answers given. After each answer the LLM returns structured JSON (action: ask, follow_up, clarify, advance, repeat, end; text; reason) which is validated. Maximum 2 follow-ups per question, no repeated questions, off-topic answers redirected politely.
+Real-time voice behaviour. Barge-in (stop speaking when the candidate starts), natural turn-taking, end-of-speech detection tuned to avoid cutting people off, silence handling (re-prompt after about 6s, 'Are you still there?', end after repeated silence), unclear speech ('Sorry, could you say that again?'), dropped calls and reconnection, hard time limit (default 15 minutes, gentle wrap-up at 13), immediate stop if the candidate asks. Target median response latency under 1.5 seconds. Stream TTS audio rather than waiting for full responses. Measure and report latency.
+Web Interview (test mode / accessible alternative). Same orchestrator, running in the browser with microphone, the Aira avatar speaking with real audio-driven lip-sync, and a text-only option. Secure expiring link per candidate.
+Failures. On any failure, set a truthful status ('Interview Failed', 'Missed Call', and so on), notify the recruiter, and allow a recruiter-controlled retry. Never produce an evaluation for an interview that did not run.
+12. Interview evaluation and report
+• Transcribe, then evaluate with a role-specific, configurable rubric: Technical Knowledge, Job-Relevant Experience, Problem-Solving, Communication (content and clarity only), Role-Specific Knowledge, Qualification Relevance. Score each 1 to 5 with transcript evidence. The evaluator may only cite what was actually said. Run a validation pass to catch unsupported claims.
+• Output: strengths, areas needing clarification, recommended follow-up questions, completion status, duration, questions and answers, and a recommendation: Recommended for Recruiter Review, Needs Further Evaluation, or Not Yet Recommended. This is advice only. The recruiter decides.
+• Generate a downloadable PDF report (candidate and job details, summary, question-wise evaluation, skills assessment, overall assessment, recruiter notes, next-step recommendation). Use an existing PDF library if present, otherwise propose the lightest one.
+• Update candidate status through valid transitions only, write the audit trail, and notify the recruiter.
+13. Level 2 and email
+• Recruiter actions: Approve for Level 2, Request Additional Review, Keep On Hold, Reject (confirmation required and permission-checked).
+• Scheduling form: date, time, time zone, mode, interviewer name and email, meeting link, instructions.
+• Email via SMTP or Gmail API with validation, templates, delivery log, failure handling, retry control and invitation history. Use the invitation template: subject 'Invitation for Level 2 Interview – [Job Title]', body with congratulations, date, time, mode, link, confirmation request, signed 'Recruitment Team, HireFlow AI'. Mark an email 'sent' only after the provider accepts it.
+14. Data model, statuses and API
+Inspect the current database first and write a safe migration plan before changing anything. Preserve existing records. Target tables: users, companies, jobs, candidates, resumes, candidate_skills, screening_results, campaigns, interviews, interview_questions, interview_responses, interview_evaluations, calls, consent_records, email_logs, notifications, candidate_status_history, audit_logs. Use unique IDs, foreign keys, validation and indexes.
+Pipeline statuses: Applied, CV Screening, Shortlisted, Level 1 Pending, Level 1 Scheduled, Level 1 Completed, Recruiter Review, Level 2 Invited, Level 2 Scheduled, Selected, Rejected, On Hold. Enforce valid transitions and keep timestamped history.
+API: first determine how the React app and Python backend currently exchange data. If a dedicated HTTP API is needed, add FastAPI as a separate layer alongside Streamlit, after explaining why. Endpoints with validation, auth and proper status codes for: auth, candidates, jobs, resume upload, JD parsing, screening, campaigns, interview start/status/results, evaluation, Level 2 scheduling, email, analytics, notifications, plus websocket endpoints for live call media and the Web Interview. Suggested service modules: candidate, jd, resume, screening, campaign, interview, voice, evaluation, email, analytics. Do not move or rename existing files.
+15. Dashboard features
+• Stats (all from real data): Total Candidates, Active Jobs, CVs Received, Shortlisted, Interviews Scheduled, Completed Interviews.
+• Recent activity feed, pipeline board (drag and drop only where transitions are valid), notifications (new CVs, screening done, shortlisted, calls scheduled/missed/completed/failed, Level 2 invitations, email failures; badge, read/unread, deep links).
+• Analytics: applications over time, status distribution, JD-wise matching, interview completion rate, Level 1 to Level 2 conversion, funnel, job-wise performance. Export Excel and PDF.
+• Settings: recruiter profile; Aira voice, language, duration, question configuration, rubric; integration status for database, telephony, STT, TTS, LLM and email (honest connected/not-configured indicators, secrets never displayed); security (password, roles, sessions); retention and deletion controls.
+16. Security, privacy and responsible AI
+Secure authentication with hashed passwords, role-based access, protected endpoints, file-upload validation, parameterised queries, rate limiting, private file storage, audit logs, encrypted secrets, retention and deletion for CVs, recordings and transcripts, restricted access to recordings. Scores must be explainable. Humans keep final decisions. No protected-attribute scoring. No emotion, personality or honesty inference from voice or face. Disclose AI use and obtain consent. Provide a non-voice alternative. Log errors without exposing candidate data or credentials.
+17. Working procedure and milestones
+Step 1 – Audit (no file changes): folder structure, frontend, backend, app.py, candidate_db.py, Excel logic, auth, dependencies, existing routes and what works. Step 2 – Report: architecture, existing and missing features, issues, plan, files to modify, new files, required accounts and costs. Wait for my approval. Step 3 – Implement one milestone at a time with the smallest necessary changes. Step 4 – Verify: run it, check terminal and console, test the feature and regressions. Step 5 – Document: what was built, files changed and created, what works, what remains, credentials needed, how to test.
+Milestones: (1) audit; (2) frontend/backend connection; (3) candidate management; (4) JD and CV processing plus screening engine; (5) auth pages from the reference design; (6) landing and dashboard Aira hero, avatar states, text assistant; (7) voice engine in the browser (STT, LLM, TTS, lip-sync) and Web Interview; (8) telephony campaign automation and live phone interview; (9) evaluation, PDF report, Level 2 and email; (10) analytics, exports, notifications, settings; (11) testing, security review, responsive pass, low-cost demo deployment plan for about 10 testers (state costs and limits honestly).
+18. Definition of done (all must be demonstrated)
+• Existing login, signup, app.py, candidate_db.py, Excel operations and routes still work; npm run build passes.
+• Auth pages follow the reference layout in HireFlow colours and keep the recruiter image; Aira appears on landing and dashboard Home only.
+• Aira hero: head follows the cursor with no visible seam, Talk Mode works, reduced-motion and phone layouts verified.
+• Avatar has all states; the mouth moves only during real audio; audio-driven lip-sync is verified.
+• JD upload and parsing, CV single and bulk upload and parsing, duplicate and unreadable-file handling, explainable ranking, threshold shortlisting and recruiter override all work and persist.
+• A campaign takes a JD plus CVs and automatically screens, shortlists and queues calls, then places a real call through the configured provider (sandbox or test number), obtains consent, conducts a dynamic interview with follow-ups, barge-in, silence handling and time limit, saves the transcript, produces an evidence-based evaluation and PDF, and updates status and notifications.
+• Missed calls, declines, failures and retries are recorded truthfully with retry limits respected.
+• Level 2 approval, scheduling and email work, with 'sent' recorded only after provider acceptance.
+• Dashboard stats, pipeline and analytics match database records exactly. Exports work.
+• No fabricated data and no dead buttons anywhere. Secrets are only in environment variables. Mobile and desktop layouts verified.
+• Final report lists every external credential I must supply, per-minute and monthly cost estimates, and a step-by-step local test guide.
+Final instruction: build HireFlow AI as a real, extensible automation product where Aira can take a job description and CVs, shortlist candidates, phone them, interview them naturally, evaluate them, and hand a clear report to the recruiter, who stays in control of every final decision.

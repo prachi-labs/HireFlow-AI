@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #10090D;
+  --bg-secondary: #1A1017;
+  --burgundy: #4B1528;
+  --burgundy-deep: #2B0D1A;
+  --burgundy-accent: #7B2948;
+  --rose-glow: #C26A8A;
+  --text-primary: #FFFFFF;
+  --text-secondary: #C8B9C0;
+  --text-muted: #8E7E87;
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-surface: rgba(255, 255, 255, 0.055);
+  --status-success: #39C98A;
+  --status-warning: #E8B45C;
+  --status-error: #EF6677;
+}
+
+html,
+body {
+  background-color: #10090D;
+  color: #FFFFFF;
+  font-family: 'Urbanist', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.font-display-aira {
+  font-family: 'Archivo', sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-variation-settings: 'wdth' 94, 'wght' 900;
+}
+
+.font-ui {
+  font-family: 'Urbanist', system-ui, sans-serif;
+}
+
+.font-data {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.font-mono-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px);
+}
+
+.burgundy-cta {
+  background: linear-gradient(135deg, #7B2948 0%, #4B1528 55%, #9B395F 100%);
+  box-shadow: 0 10px 30px rgba(123, 41, 72, 0.42);
+}
+
+.burgundy-cta:hover {
+  filter: brightness(1.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
