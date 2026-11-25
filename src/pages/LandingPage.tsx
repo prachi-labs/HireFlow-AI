@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, FileCheck2, PhoneCall, ShieldCheck, Sparkles } from 'lucide-react';
-import { AiraHero } from '../components/AiraHero';
 import { AiraStorySection } from '../components/AiraStorySection';
 
 export function LandingPage() {
@@ -23,10 +22,7 @@ export function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#10090D] text-white">
-      {/* Interactive Full-Screen Aira Hero */}
-      <AiraHero />
-
-      {/* Scroll-Driven 3D Showcase Directly Below Hero */}
+      {/* Single scroll-driven Aira landing experience */}
       <AiraStorySection />
 
       {/* Features Section */}
