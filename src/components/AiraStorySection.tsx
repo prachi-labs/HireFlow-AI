@@ -2,13 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, FileSearch, PhoneCall, Sparkles } from 'lucide-react';
 import styles from './AiraStorySection.module.css';
-import {
-  AIRA_STORY_CONFIG,
-  clamp01,
-  computeAiraStagePose,
-  rotationDegToFrameIndex,
-  stepSmoothedProgress,
-} from '../lib/airaStoryTimeline';
 
 interface DepthParticle {
   x: number;
@@ -452,10 +445,12 @@ export function AiraStorySection() {
     let idleUntil = performance.now() + 800;
 
     const renderFrame = (now: number) => {
-      const dt = Math.min(40, now - lastTimestamp);
-      lastTimestamp = now;
-      void dt;
+    const dt = Math.min(50, Math.max(1, now - lastTimestamp));
+    lastTimestamp = now;
 
+    // Frame-rate independent smoothing
+    const progressEase = 1 - Math.exp(-dt / 85);
+    const pointerEase = 1 - Math.exp(-dt / 120);
       // Read layout geometry once per frame before DOM writes (no layout thrash)
       const prevTargetP = targetP;
       readScrollProgress();
@@ -463,9 +458,10 @@ export function AiraStorySection() {
         idleUntil = now + 450;
       }
 
-      smoothedP = stepSmoothedProgress(smoothedP, targetP, AIRA_STORY_CONFIG.smoothing);
-      smoothedPointerX += (targetPointerX - smoothedPointerX) * 0.14;
-      smoothedPointerY += (targetPointerY - smoothedPointerY) * 0.14;
+     smoothedP += (targetP - smoothedP) * progressEase;
+
+     smoothedPointerX += (targetPointerX - smoothedPointerX) * pointerEase;
+     smoothedPointerY += (targetPointerY - smoothedPointerY) * pointerEase;
 
       const pose = computeAiraStagePose(smoothedP, smoothedPointerX, smoothedPointerY);
       sectionEl.dataset.progress = pose.progress.toFixed(3);
