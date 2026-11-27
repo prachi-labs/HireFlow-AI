@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Building2, Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { apiRequest } from '../lib/api';
+import recruiterPortrait from '../assets/images/recruiter_login_portrait_1794974368385.jpg';
 
 export function AuthPage({ initialMode }: { initialMode: 'login' | 'signup' }) {
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
@@ -31,12 +32,15 @@ export function AuthPage({ initialMode }: { initialMode: 'login' | 'signup' }) {
   const [newPassword, setNewPassword] = useState('');
 
   const switchMode = (next: 'login' | 'signup') => {
-    setMode(next);
-    setError(null);
-    setInfoMsg(null);
-    setForgotOpen(false);
-    window.history.replaceState(null, '', next === 'login' ? '/login' : '/signup');
-  };
+  setMode(next);
+  setError(null);
+  setInfoMsg(null);
+  setForgotOpen(false);
+
+  navigate(next === 'login' ? '/login' : '/signup', {
+    replace: true,
+  });
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -428,11 +432,11 @@ export function AuthPage({ initialMode }: { initialMode: 'login' | 'signup' }) {
           {/* Right Recruiter Portrait Column (Never Aira on Auth Pages) */}
           <div className="lg:col-span-5 relative min-h-[260px] lg:min-h-full bg-[#2B0D1A]">
             <img
-              src="/src/assets/images/recruiter_login_portrait_1794974368385.jpg"
-              alt="Human talent acquisition lead in executive studio"
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover object-center"
-            />
+               src={recruiterPortrait}
+               alt="Human talent acquisition lead in executive studio"
+               referrerPolicy="no-referrer"
+               className="w-full h-full object-cover object-center"
+                />
             <div
               className="absolute inset-0"
               style={{
