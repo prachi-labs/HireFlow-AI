@@ -2,6 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, FileSearch, PhoneCall, Sparkles } from 'lucide-react';
 import styles from './AiraStorySection.module.css';
+import {
+  AIRA_STORY_CONFIG,
+  clamp01,
+  computeAiraStagePose,
+  rotationDegToFrameIndex,
+} from '../lib/airaStoryTimeline';
 
 interface DepthParticle {
   x: number;
