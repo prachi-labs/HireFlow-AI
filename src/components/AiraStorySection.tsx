@@ -274,102 +274,117 @@ export function AiraStorySection() {
     };
   }, []);
 
-  // Option 1 & Option 2 Asset Preloaders (inactive while assetMode === 'fallback-image')
+  
+  // Option 1 & Option 2 Asset Preloaders
   useEffect(() => {
     if (reducedMotion) return;
 
+    // Option 1: Turntable video
     if (AIRA_STORY_CONFIG.assetMode === 'turntable-video') {
       let active = true;
       let objectUrl: string | null = null;
+
       fetch(AIRA_STORY_CONFIG.assets.turntableVideoUrl)
         .then(async (res) => {
-          if (!res.ok) throw new Error('Unable to load Aira turntable video.');
+          if (!res.ok) {
+            throw new Error('Unable to load Aira turntable video.');
+          }
+
           const blob = await res.blob();
+
           if (!active) return;
+
           objectUrl = URL.createObjectURL(blob);
           setTurntableObjectUrl(objectUrl);
           setAssetError(null);
         })
         .catch(() => {
-          if (active) setAssetError('Aira 3D turntable video could not be loaded.');
+          if (active) {
+            setAssetError('Aira 3D turntable video could not be loaded.');
+          }
         });
+
       return () => {
         active = false;
-        if (objectUrl) URL.revokeObjectURL(objectUrl);
+
+        if (objectUrl) {
+          URL.revokeObjectURL(objectUrl);
+        }
       };
     }
 
-  if (AIRA_STORY_CONFIG.assetMode === 'frame-sequence') {
-  let active = true;
+    // Option 2: Frame sequence with batch loading
+    if (AIRA_STORY_CONFIG.assetMode === 'frame-sequence') {
+      let active = true;
 
-  const total = AIRA_STORY_CONFIG.assets.frameCount;
-  const batchSize = 12;
+      const total = AIRA_STORY_CONFIG.assets.frameCount;
+      const batchSize = 12;
 
-  framesRef.current = new Array<HTMLImageElement | null>(total).fill(null);
-  lastFrameIdxRef.current = -1;
+      framesRef.current = new Array<HTMLImageElement | null>(total).fill(null);
+      lastFrameIdxRef.current = -1;
 
-  const urlFor = (index: number) =>
-    AIRA_STORY_CONFIG.assets.frameUrlTemplate.replace(
-      '{index}',
-      String(index).padStart(4, '0')
-    );
+      const urlFor = (index: number) =>
+        AIRA_STORY_CONFIG.assets.frameUrlTemplate.replace(
+          '{index}',
+          String(index).padStart(4, '0')
+        );
 
-  const loadFrame = (index: number): Promise<void> =>
-    new Promise((resolve) => {
-      const img = new Image();
+      const loadFrame = (index: number): Promise<void> =>
+        new Promise((resolve) => {
+          const img = new Image();
 
-      img.onload = () => {
-        if (active) {
-          framesRef.current[index - 1] = img;
-          wakeRenderLoopRef.current?.();
+          img.onload = () => {
+            if (active) {
+              framesRef.current[index - 1] = img;
+              wakeRenderLoopRef.current?.();
+            }
+
+            resolve();
+          };
+
+          img.onerror = () => {
+            console.warn(`Aira frame ${index} failed to load.`);
+            resolve();
+          };
+
+          img.src = urlFor(index);
+        });
+
+      const preloadFrames = async () => {
+        // Load the first frame immediately.
+        await loadFrame(1);
+
+        if (!active) return;
+
+        if (framesRef.current[0]) {
+          setAssetError(null);
+        } else {
+          setAssetError('Aira turntable frame sequence failed to load.');
+          return;
         }
 
-        resolve();
+        // Load the remaining frames in batches of 12.
+        for (let start = 2; start <= total; start += batchSize) {
+          if (!active) return;
+
+          const end = Math.min(start + batchSize - 1, total);
+          const batch: Promise<void>[] = [];
+
+          for (let i = start; i <= end; i++) {
+            batch.push(loadFrame(i));
+          }
+
+          await Promise.all(batch);
+        }
       };
 
-      img.onerror = () => {
-        console.warn(`Aira frame ${index} failed to load.`);
-        resolve();
+      void preloadFrames();
+
+      return () => {
+        active = false;
       };
-
-      img.src = urlFor(index);
-    });
-
-  const preloadFrames = async () => {
-    // Load the first frame immediately.
-    await loadFrame(1);
-
-    if (!active) return;
-
-    if (framesRef.current[0]) {
-      setAssetError(null);
-    } else {
-      setAssetError('Aira turntable frame sequence failed to load.');
-      return;
     }
-
-    // Load remaining frames in batches of 12.
-    for (let start = 2; start <= total; start += batchSize) {
-      if (!active) return;
-
-      const end = Math.min(start + batchSize - 1, total);
-
-      const batch: Promise<void>[] = [];
-
-      for (let i = start; i <= end; i++) {
-        batch.push(loadFrame(i));
-      }
-
-      await Promise.all(batch);
-    }
-  };
-
-  void preloadFrames();
-
-  return () => {
-    active = false;
-  };
-}, [reducedMotion]);
+  }, [reducedMotion]);
 
   // Main Scroll-Driven rAF Loop (paused automatically when section is off-screen)
   useEffect(() => {
