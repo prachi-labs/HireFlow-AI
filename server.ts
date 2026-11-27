@@ -23,6 +23,7 @@ const allowedOrigins = new Set([
   'https://prachi-labs.github.io',
   'http://localhost:5173',
   'http://127.0.0.1:5173',
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
 ]);
 
 app.use((req, res, next) => {
@@ -126,10 +127,11 @@ app.use(express.urlencoded({ extended: true }));
     });
   }
 
-  const PORT = 3000;
-  server.listen(PORT, '0.0.0.0', () => {
-    console.log(`HireFlow AI server listening on http://localhost:${PORT}`);
-  });
+  const PORT = Number(process.env.PORT) || 3000;
+
+    server.listen(PORT, '0.0.0.0', () => {
+      console.log(`HireFlow AI server listening on port ${PORT}`);
+    });
 }
 
 startServer().catch((err) => {
