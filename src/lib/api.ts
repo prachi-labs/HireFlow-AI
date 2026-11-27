@@ -8,16 +8,18 @@ export async function apiRequest<T = unknown>(
   const isFormData =
     typeof FormData !== 'undefined' && options.body instanceof FormData;
 
-  const headers: Record<string, string> = {
-    ...(isFormData
-      ? {}
-      : { 'Content-Type': 'application/json' }),
-    ...(options.headers as Record<string, string> | undefined),
-  };
+  const headers: Record<string, string> = isFormData
+    ? { ...(options.headers as Record<string, string> | undefined) }
+    : {
+        'Content-Type': 'application/json',
+        ...(options.headers as Record<string, string> | undefined),
+      };
 
-  const endpoint = `${API_BASE_URL}${url}`;
+  const requestUrl = /^https?:\/\//i.test(url)
+    ? url
+    : `${API_BASE_URL}${url.startsWith('/') ? url : `/${url}`}`;
 
-  const resp = await fetch(endpoint, {
+  const resp = await fetch(requestUrl, {
     ...options,
     credentials: 'include',
     headers,
