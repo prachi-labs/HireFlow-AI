@@ -248,6 +248,10 @@
     height: var(--story-height-mobile, 350vh);
   }
 
+   .stickyStage {
+    min-height: 100svh;
+  }
+
   .characterViewport {
     align-items: center;
     padding-top: 72px;
