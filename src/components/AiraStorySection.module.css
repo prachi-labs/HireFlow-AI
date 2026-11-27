@@ -137,10 +137,11 @@
 .centerBeatCopy {
   position: absolute;
   left: 50%;
-  top: clamp(24px, 5.2svh, 52px);
-  width: min(90vw, 680px);
+  top: clamp(28px, 4.5svh, 48px);
+  width: min(92vw, 760px);
   text-align: center;
-  z-index: 12;
+  z-index: 15;
+  pointer-events: none;
   will-change: transform, opacity, filter;
 }
 
@@ -277,10 +278,9 @@
   }
 
   .centerBeatCopy {
-    top: 22px;
-    width: calc(100% - 48px);
-  }
-
+  top: 20px;
+  width: calc(100% - 40px);
+}
   .desktopCardLeft,
   .desktopCardRight,
   .closingBeatCopy {
