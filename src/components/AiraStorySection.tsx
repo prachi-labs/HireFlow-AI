@@ -238,6 +238,9 @@ export function AiraStorySection() {
   const lastFrameIdxRef = useRef<number>(-1);
   const activeBeatIdxRef = useRef<number>(0);
 
+  // Wake the animation loop when an image finishes loading.
+  const wakeRenderLoopRef = useRef<(() => void) | null>(null);
+
   // Ensure html/body overflow-x: clip while this landing section is mounted so position: sticky works in Chromium
   useEffect(() => {
     const htmlEl = document.documentElement;
@@ -299,28 +302,51 @@ export function AiraStorySection() {
     if (AIRA_STORY_CONFIG.assetMode === 'frame-sequence') {
       let active = true;
       const total = AIRA_STORY_CONFIG.assets.frameCount;
+
       framesRef.current = new Array<HTMLImageElement | null>(total).fill(null);
+      lastFrameIdxRef.current = -1;
 
       const urlFor = (oneBasedIndex: number) =>
-        AIRA_STORY_CONFIG.assets.frameUrlTemplate.replace('{index}', String(oneBasedIndex).padStart(4, '0'));
+        AIRA_STORY_CONFIG.assets.frameUrlTemplate.replace(
+          '{index}',
+          String(oneBasedIndex).padStart(4, '0')
+        );
 
-      // Preload frame 1 immediately, then load the remaining sequence
       const firstImg = new Image();
+
       firstImg.onload = () => {
         if (!active) return;
+
         framesRef.current[0] = firstImg;
+        lastFrameIdxRef.current = -1;
         setAssetError(null);
+
+        wakeRenderLoopRef.current?.();
+
         for (let i = 2; i <= total; i++) {
           const img = new Image();
+
           img.onload = () => {
-            if (active) framesRef.current[i - 1] = img;
+            if (!active) return;
+
+            framesRef.current[i - 1] = img;
+            wakeRenderLoopRef.current?.();
           };
+
+          img.onerror = () => {
+            console.warn(`Aira frame ${i} failed to load.`);
+          };
+
           img.src = urlFor(i);
         }
       };
+
       firstImg.onerror = () => {
-        if (active) setAssetError('Aira turntable frame sequence failed to load.');
+        if (active) {
+          setAssetError('Aira turntable frame sequence failed to load.');
+        }
       };
+
       firstImg.src = urlFor(1);
 
       return () => {
@@ -451,24 +477,64 @@ export function AiraStorySection() {
         }
       }
 
-      // Optional Option 2: Draw scrubbed frame sequence onto DPR<=2 canvas
+      // Draw the requested frame, using frame 1 as the initial fallback.
       const fCanvas = frameCanvasRef.current;
+
       if (AIRA_STORY_CONFIG.assetMode === 'frame-sequence' && fCanvas) {
-        const idx = rotationDegToFrameIndex(pose.rotationDeg, AIRA_STORY_CONFIG.assets.frameCount);
-        const frameImg = framesRef.current[idx] || framesRef.current[0];
-        if (frameImg && idx !== lastFrameIdxRef.current) {
-          const ctx = fCanvas.getContext('2d');
-          if (ctx) {
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            const targetW = Math.round(frameImg.naturalWidth * Math.min(1, dpr * 0.75));
-            const targetH = Math.round(frameImg.naturalHeight * Math.min(1, dpr * 0.75));
-            if (fCanvas.width !== targetW || fCanvas.height !== targetH) {
-              fCanvas.width = targetW;
-              fCanvas.height = targetH;
+        const idx = rotationDegToFrameIndex(
+          pose.rotationDeg,
+          AIRA_STORY_CONFIG.assets.frameCount
+        );
+
+        const requestedFrame = framesRef.current[idx];
+
+        const usingFallback =
+          !requestedFrame && lastFrameIdxRef.current === -1;
+
+        const frameImg = requestedFrame || (
+          usingFallback ? framesRef.current[0] : null
+        );
+
+        if (frameImg) {
+          const actualFrameIdx = requestedFrame ? idx : 0;
+
+          if (actualFrameIdx !== lastFrameIdxRef.current) {
+            const ctx = fCanvas.getContext('2d');
+
+            if (ctx) {
+              const dpr = Math.min(window.devicePixelRatio || 1, 2);
+              const scale = Math.min(1, dpr * 0.75);
+
+              const targetW = Math.max(
+                1,
+                Math.round(frameImg.naturalWidth * scale)
+              );
+
+              const targetH = Math.max(
+                1,
+                Math.round(frameImg.naturalHeight * scale)
+              );
+
+              if (
+                fCanvas.width !== targetW ||
+                fCanvas.height !== targetH
+              ) {
+                fCanvas.width = targetW;
+                fCanvas.height = targetH;
+              }
+
+              ctx.clearRect(0, 0, fCanvas.width, fCanvas.height);
+
+              ctx.drawImage(
+                frameImg,
+                0,
+                0,
+                fCanvas.width,
+                fCanvas.height
+              );
+
+              lastFrameIdxRef.current = actualFrameIdx;
             }
-            ctx.clearRect(0, 0, fCanvas.width, fCanvas.height);
-            ctx.drawImage(frameImg, 0, 0, fCanvas.width, fCanvas.height);
-            lastFrameIdxRef.current = idx;
           }
         }
       }
@@ -563,6 +629,8 @@ export function AiraStorySection() {
       }
     };
 
+    wakeRenderLoopRef.current = startLoop;
+
     const onScroll = () => {
       startLoop();
     };
@@ -608,6 +676,9 @@ export function AiraStorySection() {
 
     return () => {
       stopLoop();
+      if (wakeRenderLoopRef.current === startLoop) {
+        wakeRenderLoopRef.current = null;
+      }
       observer.disconnect();
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
