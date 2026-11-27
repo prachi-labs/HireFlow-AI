@@ -15,10 +15,44 @@ async function startServer() {
   initDatabase();
   await syncCandidatesToExcel();
 
-  const app = express();
-  app.use(cookieParser());
-  app.use(express.json({ limit: '5mb' }));
-  app.use(express.urlencoded({ extended: true }));
+ 
+const app = express();
+
+// CORS configuration
+const allowedOrigins = new Set([
+  'https://prachi-labs.github.io',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+]);
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (origin && allowedOrigins.has(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Vary', 'Origin');
+  }
+
+  if (req.method === 'OPTIONS') {
+    if (origin && !allowedOrigins.has(origin)) {
+      res.status(403).end();
+      return;
+    }
+
+    res.status(204).end();
+    return;
+  }
+
+  next();
+});
+
+app.use(cookieParser());
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: true }));
+
 
   // Simple in-memory rate limit for auth & public interview endpoints
   const rateBuckets = new Map<string, { count: number; resetAt: number }>();
