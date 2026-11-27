@@ -380,7 +380,7 @@ export function AiraStorySection() {
 
       void preloadFrames();
 
-      return () => {
+          return () => {
         active = false;
       };
     }
