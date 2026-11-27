@@ -20,12 +20,11 @@ export const AIRA_STORY_CONFIG = {
   assetMode: 'frame-sequence' as AiraAssetMode,
 
   assets: {
-    turntableVideoUrl: '/assets/aira-turntable.mp4',
-    frameCount: 300,
-    frameUrlTemplate: '/assets/aira-frames/aira{index}.webp',
-    fallbackImageUrl:
-      '/assets/aistudio/Friendly_AI_Assistant_Presenting_Tablet_c095fa83.png',
-  },
+  turntableVideoUrl: `${import.meta.env.BASE_URL}assets/aira-turntable.mp4`,
+  frameCount: 300,
+  frameUrlTemplate: `${import.meta.env.BASE_URL}assets/aira-frames/aira{index}.webp`,
+  fallbackImageUrl: `${import.meta.env.BASE_URL}assets/aistudio/Friendly_AI_Assistant_Presenting_Tablet_c095fa83.png`,
+},
 
   /** Scroll track height in vh. */
   desktopScrollVh: 500,
